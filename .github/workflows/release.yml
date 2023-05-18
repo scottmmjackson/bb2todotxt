@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: stable
+      - uses: snapcore/action-build@v1
+        id: snapcraft
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser
