@@ -34,11 +34,12 @@ nfpms:
       - rpm
       - termux.deb
       - archlinux
-snapcrafts:
-  -
-    publish:  false
-    summary: Converts pull request tasks from bitbucket to todo txt tasks
-    description: Converts pull request tasks from bitbucket to todo txt tasks
+# Disable snapcrafts, they don't work
+#snapcrafts:
+#  -
+#    publish:  false
+#    summary: Converts pull request tasks from bitbucket to todo txt tasks
+#    description: Converts pull request tasks from bitbucket to todo txt tasks
 brews:
   -
     tap:
