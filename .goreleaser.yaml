@@ -21,6 +21,42 @@ archives:
     format_overrides:
     - goos: windows
       format: zip
+nfpms:
+  -
+    package_name: "{{ .ProjectName }}"
+    vendor: Scott Jackson
+    homepage: https://github.com/scottmmjackson/bb2todotxt
+    maintainer: Scott Jackson <scottmmjackson@gmail.com>
+    description: Converts pull request tasks from bitbucket to todo txt tasks
+    license: BSD 3.0
+    formats:
+      - deb
+      - rpm
+      - termux.deb
+      - archlinux
+snapcrafts:
+  -
+    publish:  false
+    summary: Converts pull request tasks from bitbucket to todo txt tasks
+    description: Converts pull request tasks from bitbucket to todo txt tasks
+brews:
+  -
+    tap:
+      owner: scottmmjackson
+      name: homebrew-sj
+      branch: main
+      pull_request:
+        enabled: true
+        base: main
+      git:
+        url: 'ssh://git@github.com:scottmmjackson/bb2todotxt.git'
+    commit_author:
+      name: goreleaserbot
+      email: scottmmjackson@gmail.com
+    homepage: "https://github.com/scottmmjackson/bb2todotxt"
+    description: Converts pull request tasks from bitbucket to todo txt tasks
+    license: BSD 3.0
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:
