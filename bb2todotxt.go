@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -10,6 +9,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+
+	"github.com/kirsle/configdir"
 )
 
 const VERSION = "v0.0.3"
@@ -17,6 +19,40 @@ const VERSION = "v0.0.3"
 type bitbucketConfig struct {
 	Username string `json:username`
 	Password string `json:password`
+}
+
+const PACKAGE_NAME = "com.scottmmjackson.bb2todotxt"
+
+var WELL_KNOWN_CONFIG_FILE_PATH = filepath.Join(configdir.LocalConfig(PACKAGE_NAME), "bitbucket.json")
+
+func resolveConfigFile(commandLinePath string) (*bitbucketConfig, error) {
+	var err error
+	var bitbucketConfigString []byte
+	var bitbucketConfigMap *bitbucketConfig
+	if commandLinePath != "" {
+		_, err = os.Stat(commandLinePath)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to open config file at %s: %s", WELL_KNOWN_CONFIG_FILE_PATH, err)
+		}
+		bitbucketConfigString, err = os.ReadFile(commandLinePath)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to upen config file at %s: %s", commandLinePath, err)
+		}
+	} else {
+		_, err = os.Stat(WELL_KNOWN_CONFIG_FILE_PATH)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to open config file at %s: %s", WELL_KNOWN_CONFIG_FILE_PATH, err)
+		}
+		bitbucketConfigString, err = os.ReadFile(WELL_KNOWN_CONFIG_FILE_PATH)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to open config file at %s: %s", WELL_KNOWN_CONFIG_FILE_PATH, err)
+		}
+	}
+	err = json.Unmarshal(bitbucketConfigString, &bitbucketConfigMap)
+	if err != nil {
+		return nil, err
+	}
+	return bitbucketConfigMap, nil
 }
 
 func commandLine() (*bitbucketConfig, string, string, int, error) {
@@ -31,16 +67,9 @@ func commandLine() (*bitbucketConfig, string, string, int, error) {
 		fmt.Println(VERSION)
 		os.Exit(0)
 	}
-	if *bitbucketConfigFile == "" {
-		return bitbucketConfigMap, "", "", 0, errors.New("Required flags not provided.")
-	}
-	bitbucketConfigString, err := os.ReadFile(*bitbucketConfigFile)
+	bitbucketConfigMap, err := resolveConfigFile(*bitbucketConfigFile)
 	if err != nil {
-		return bitbucketConfigMap, "", "", 0, err
-	}
-	err = json.Unmarshal(bitbucketConfigString, &bitbucketConfigMap)
-	if err != nil {
-		return bitbucketConfigMap, "", "", 0, err
+		return nil, "", "", 0, err
 	}
 	return bitbucketConfigMap, *slug, *owner, *id, nil
 }
@@ -117,6 +146,9 @@ func getTasks(bucketConfig *bitbucketConfig, uri string) ([]Task, string) {
 		log.Fatalf("error: %s", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode > 300 {
+		log.Fatalf("error: %s", resp.Status)
+	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("error: %s", err)
@@ -143,10 +175,10 @@ func main() {
 		BITBUCKET_URL,
 		owner, slug, id,
 	)
-	taskChunk, next := getTasks(bitbucketConfig, uri)
-	for next != "" {
+	var taskChunk []Task
+	for uri != "" {
+		taskChunk, uri = getTasks(bitbucketConfig, uri)
 		tasks = append(tasks, taskChunk...)
-		taskChunk, next = getTasks(bitbucketConfig, next)
 	}
 	todoTmpl.Execute(os.Stdout, tasks)
 }
