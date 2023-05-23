@@ -51,6 +51,8 @@ brews:
         base: main
       git:
         url: 'ssh://git@github.com:scottmmjackson/bb2todotxt.git'
+        private_key: '{{ .Env.BREW_KEY }}'
+    url_template: 'https://github.com/scottmmjackson/bb2todotxt/releases/download/{{ .Tag }}/{{ .ArtifactName }}"'
     commit_author:
       name: goreleaserbot
       email: scottmmjackson@gmail.com

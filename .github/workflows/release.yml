@@ -19,8 +19,8 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: stable
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v2
+#      - name: Install Snapcraft
+#        uses: samuelmeuli/action-snapcraft@v2
       - uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser
@@ -28,3 +28,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BREW_KEY: ${{ secrets.BREW_KEY }}
