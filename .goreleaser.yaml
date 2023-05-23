@@ -45,20 +45,14 @@ brews:
     tap:
       owner: scottmmjackson
       name: homebrew-sj
-      branch: main
       pull_request:
         enabled: true
         base: main
-      git:
-        url: 'ssh://git@github.com:scottmmjackson/bb2todotxt.git'
-        private_key: '{{ .Env.BREW_KEY }}'
-    url_template: 'https://github.com/scottmmjackson/bb2todotxt/releases/download/{{ .Tag }}/{{ .ArtifactName }}"'
-    commit_author:
-      name: goreleaserbot
-      email: scottmmjackson@gmail.com
+    folder: Formula
     homepage: "https://github.com/scottmmjackson/bb2todotxt"
     description: Converts pull request tasks from bitbucket to todo txt tasks
-    license: BSD 3.0
+    test: |
+      system "#{bin}/bb2todotxt -v"
 
 checksum:
   name_template: 'checksums.txt'

@@ -12,6 +12,8 @@ import (
 	"os"
 )
 
+const VERSION = "v0.0.3"
+
 type bitbucketConfig struct {
 	Username string `json:username`
 	Password string `json:password`
@@ -19,11 +21,16 @@ type bitbucketConfig struct {
 
 func commandLine() (*bitbucketConfig, string, string, int, error) {
 	var bitbucketConfigMap *bitbucketConfig
+	version := flag.Bool("v", false, "print version and quit")
 	slug := flag.String("slug", "", "repo slug")
 	owner := flag.String("owner", "", "repo owner")
 	id := flag.Int("id", 0, "pull request id")
 	bitbucketConfigFile := flag.String("config", "", "Bitbucket config file")
 	flag.Parse()
+	if *version {
+		fmt.Println(VERSION)
+		os.Exit(0)
+	}
 	if *bitbucketConfigFile == "" {
 		return bitbucketConfigMap, "", "", 0, errors.New("Required flags not provided.")
 	}
