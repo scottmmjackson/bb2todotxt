@@ -45,6 +45,7 @@ brews:
     tap:
       owner: scottmmjackson
       name: homebrew-sj
+      token: '{{ .Env.BREW_GITHUB_TOKEN }}'
       pull_request:
         enabled: true
         base: main
